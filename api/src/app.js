@@ -12,6 +12,7 @@ const server = express();
 
 const AuthGoogle = require('./routes/AuthGoogle.js');
 const Usuarios = require('./routes/Usuarios.js');
+const Publicaciones = require('./routes/Publicaciones.js');
 
 server.name = 'API';
 server.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
@@ -47,5 +48,6 @@ server.use((err, req, res, next) => {
 
 server.use('/auth/google', AuthGoogle);
 server.use('/usuarios', Usuarios);
+server.use('/publicaciones', Publicaciones);
 
 module.exports = server;
