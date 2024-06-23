@@ -3,7 +3,7 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const passport = require('passport');
-const session = require('express-session'); 
+const session = require('express-session');
 require('dotenv').config();
 require('../src/controllers/Passport.js')
 require('./db.js');
@@ -13,6 +13,7 @@ const server = express();
 const AuthGoogle = require('./routes/AuthGoogle.js');
 const Usuarios = require('./routes/Usuarios.js');
 const Publicaciones = require('./routes/Publicaciones.js');
+const Solicitudes = require('./routes/Solicitudes.js');
 
 server.name = 'API';
 server.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
@@ -49,5 +50,6 @@ server.use((err, req, res, next) => {
 server.use('/auth/google', AuthGoogle);
 server.use('/usuarios', Usuarios);
 server.use('/publicaciones', Publicaciones);
+server.use('/solicitudes', Solicitudes)
 
 module.exports = server;

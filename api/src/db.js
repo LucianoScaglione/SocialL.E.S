@@ -21,10 +21,18 @@ let entries = Object.entries(sequelize.models);
 let capsEntries = entries.map((entry) => [entry[0][0].toUpperCase() + entry[0].slice(1), entry[1]]);
 sequelize.models = Object.fromEntries(capsEntries);
 
-const { Usuarios, Publicaciones } = sequelize.models;
+const { Usuarios, Publicaciones, Solicitudes } = sequelize.models;
 
 Usuarios.hasMany(Publicaciones);
 Publicaciones.belongsTo(Usuarios);
+
+// Asociación de Emisor
+Usuarios.hasMany(Solicitudes, { foreignKey: 'EmisorId', as: 'SolicitudesEnviadas' });
+Solicitudes.belongsTo(Usuarios, { foreignKey: 'EmisorId', as: 'Emisor' });
+
+// Asociación de Receptor
+Usuarios.hasMany(Solicitudes, { foreignKey: 'ReceptorId', as: 'SolicitudesRecibidas' });
+Solicitudes.belongsTo(Usuarios, { foreignKey: 'ReceptorId', as: 'Receptor' });
 
 module.exports = {
   ...sequelize.models,
