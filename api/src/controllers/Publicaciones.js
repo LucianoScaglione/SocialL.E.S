@@ -29,7 +29,7 @@ const crearPublicaciones = async (req, res, next) => {
   try {
     const { contenido, UsuarioId } = req.body;
     if (!(contenido && UsuarioId)) {
-      res.status(400).send("Debes llenar los campos requeridos");
+      return res.status(400).send("Debes llenar los campos requeridos");
     }
     const buscarUsuario = await Usuarios.findOne({ where: { id: UsuarioId } });
     if (buscarUsuario) {
@@ -47,7 +47,7 @@ const crearPublicaciones = async (req, res, next) => {
       });
       res.status(200).send(crearPublicacion);
     } else {
-      res.status(400).send("No existe usuario registrado con ese id");
+      return res.status(400).send("No existe usuario registrado con ese id");
     };
   } catch (error) {
     next(error);
@@ -79,10 +79,10 @@ const editarPublicacion = async (req, res, next) => {
     const { contenido } = req.body;
     const buscarPublicacion = await Publicaciones.findOne({ where: { id } });
     if (!buscarPublicacion) {
-      res.status(400).send("No se encontró ninguna publicación con ese id");
+      return res.status(400).send("No se encontró ninguna publicación con ese id");
     }
     if (contenido === buscarPublicacion.contenido) {
-      res.status(400).send("La publicación debe tener un distinto contenido para poder editarla");
+      return res.status(400).send("La publicación debe tener un distinto contenido para poder editarla");
     } else {
       const editarPublicacion = await buscarPublicacion.update({
         contenido,
@@ -103,7 +103,7 @@ const eliminarPublicacion = async (req, res, next) => {
       await Publicaciones.destroy({ where: { id } });
       res.status(200).send("Eliminaste la publicación registrada");
     } else {
-      res.status(400).send("No existe publicación registrada con ese id");
+      return res.status(400).send("No existe publicación registrada con ese id");
     };
   } catch (error) {
     next(error);

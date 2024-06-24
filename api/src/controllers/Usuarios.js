@@ -37,8 +37,8 @@ const obtenerUsuario = async (req, res, next) => {
 const crearUsuario = async (req, res, next) => {
   try {
     const { nombre, apellido, correo, fotoDePerfil, contraseña, fechaDeNacimiento, genero } = req.body;
-    if (!(nombre && apellido && correo && contraseña && fechaDeNacimiento && genero)) {
-      res.status(400).send("Debes llenar los campos requeridos");
+    if (!(nombre && apellido && correo && contraseña && genero)) {
+      return res.status(400).send("Debes llenar los campos requeridos");
     };
     const buscarUsuarioRegistrado = await Usuarios.findOne({ where: { correo } });
     if (!buscarUsuarioRegistrado) {
@@ -56,7 +56,7 @@ const crearUsuario = async (req, res, next) => {
       usuario.token = token;
       res.status(201).json({ "usuario": usuario, "token": token });
     } else {
-      res.status(400).send("Ya existe un usuario registrado con ese correo, intente con otro");
+      return res.status(400).send("Ya existe un usuario registrado con ese correo, intente con otro");
     };
   } catch (error) {
     next(error);
@@ -67,7 +67,7 @@ const accesoUsuario = async (req, res, next) => {
   try {
     const { correo, contraseña } = req.body;
     if (!correo && !contraseña) {
-      res.status(400).send("Se requiere rellenar los campos: email y password");
+      return res.status(400).send("Se requiere rellenar los campos: email y password");
     };
     const usuario = await Usuarios.findOne({ where: { correo } });
     if (usuario && (await bcrypt.compare(contraseña, usuario.contraseña))) {
@@ -75,7 +75,7 @@ const accesoUsuario = async (req, res, next) => {
       usuario.token = token;
       res.status(201).json({ "usuario": usuario, "token": token });
     } else {
-      res.status(400).send("Usuario incorrecto");
+      return res.status(400).send("Usuario incorrecto");
     };
   } catch (error) {
     next(error);
@@ -88,13 +88,13 @@ const actualizarUsuario = async (req, res, next) => {
     const { nombre, apellido, correo, fotoDePerfil, nuevaContraseña, fechaDeNacimiento, genero } = req.body;
     const buscarUsuario = await Usuarios.findOne({ where: { id } });
     if (!buscarUsuario) {
-      res.status(400).send("No existe usuario registrado con ese id");
+      return res.status(400).send("No existe usuario registrado con ese id");
     };
     let contraseñaEncriptada = buscarUsuario.contraseña;
     if (nuevaContraseña) {
       contraseñaEncriptada = await bcrypt.hash(nuevaContraseña, 10);
       if (await bcrypt.compare(nuevaContraseña, buscarUsuario.contraseña))
-        res.status(400).send("Debes ingresar una contraseña distinta a la anterior");
+        return res.status(400).send("Debes ingresar una contraseña distinta a la anterior");
     };
     const editarUsuario = await buscarUsuario.update({
       nombre,
@@ -119,7 +119,7 @@ const eliminarUsuario = async (req, res, next) => {
       await Usuarios.destroy({ where: { id } });
       res.status(200).send("Usuario eliminado");
     } else {
-      res.status(400).send("No existe usuario registrado con ese id");
+      return res.status(400).send("No existe usuario registrado con ese id");
     }
   } catch (error) {
     next(error);
