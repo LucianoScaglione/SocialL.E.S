@@ -15,6 +15,7 @@ const Usuarios = require('./routes/Usuarios.js');
 const Publicaciones = require('./routes/Publicaciones.js');
 const Solicitudes = require('./routes/Solicitudes.js');
 const Amigos = require('./routes/Amigos.js');
+const Comentarios = require('./routes/Comentarios.js');
 
 server.name = 'API';
 server.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
@@ -53,5 +54,6 @@ server.use('/usuarios', Usuarios);
 server.use('/publicaciones', Publicaciones);
 server.use('/solicitudes', Solicitudes)
 server.use('/amigos', Amigos)
+server.use('/comentarios', Comentarios);
 
 module.exports = server;

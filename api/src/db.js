@@ -21,7 +21,7 @@ let entries = Object.entries(sequelize.models);
 let capsEntries = entries.map((entry) => [entry[0][0].toUpperCase() + entry[0].slice(1), entry[1]]);
 sequelize.models = Object.fromEntries(capsEntries);
 
-const { Usuarios, Publicaciones, Solicitudes, Amigos } = sequelize.models;
+const { Usuarios, Publicaciones, Solicitudes, Amigos, Comentarios } = sequelize.models;
 
 Usuarios.hasMany(Publicaciones);
 Publicaciones.belongsTo(Usuarios);
@@ -37,6 +37,12 @@ Solicitudes.belongsTo(Usuarios, { foreignKey: 'ReceptorId', as: 'Receptor' });
 // Relación bidireccional
 Amigos.belongsTo(Usuarios, { foreignKey: 'UsuarioId', as: 'Usuario' });
 Amigos.belongsTo(Usuarios, { foreignKey: 'AmigoId', as: 'Amigo' });
+
+Usuarios.hasMany(Comentarios, { foreignKey: 'UsuarioId' });
+Comentarios.belongsTo(Usuarios, { foreignKey: 'UsuarioId' });
+
+Publicaciones.hasMany(Comentarios, { foreignKey: 'PublicacionId' });
+Comentarios.belongsTo(Publicaciones, { foreignKey: 'PublicacionId' });
 
 module.exports = {
   ...sequelize.models,
