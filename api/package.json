@@ -25,6 +25,7 @@
     "passport": "^0.7.0",
     "passport-google-oauth2": "^0.2.0",
     "pg": "^8.5.1",
-    "sequelize": "^6.3.5"
+    "sequelize": "^6.3.5",
+    "socket.io": "4.7.5"
   }
 }

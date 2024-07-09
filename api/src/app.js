@@ -8,7 +8,11 @@ require('dotenv').config();
 require('../src/controllers/Passport.js')
 require('./db.js');
 
+const { Server } = require('socket.io');
+const { createServer } = require('node:http');
 const server = express();
+const httpServer = createServer(server);
+const io = new Server(httpServer)
 
 const AuthGoogle = require('./routes/AuthGoogle.js');
 const Usuarios = require('./routes/Usuarios.js');
@@ -16,6 +20,8 @@ const Publicaciones = require('./routes/Publicaciones.js');
 const Solicitudes = require('./routes/Solicitudes.js');
 const Amigos = require('./routes/Amigos.js');
 const Comentarios = require('./routes/Comentarios.js');
+const socket = require('./routes/socket.js');
+const { crearMensaje, listarMensajesEnChat } = require('./controllers/Mensajes.js');
 
 server.name = 'API';
 server.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
@@ -55,5 +61,40 @@ server.use('/publicaciones', Publicaciones);
 server.use('/solicitudes', Solicitudes)
 server.use('/amigos', Amigos)
 server.use('/comentarios', Comentarios);
+server.use('/socket', socket)
 
-module.exports = server;
+/*
+io: Se refiere a la instancia del servidor de Socket.IO. Se utiliza para emitir eventos a todos los clientes conectados o para manejar eventos de conexión y desconexión a nivel global.
+
+socket: Se refiere a la instancia de un cliente específico. Se utiliza para emitir eventos a ese cliente en particular o para manejar eventos que ese cliente específico ha enviado.
+
+El método 'emit' se utiliza para enviar mensajes o eventos desde el servidor al cliente, o viceversa. Puedes usarlo para enviar datos junto con el evento.
+
+El método 'on' se utiliza para escuchar eventos. Cuando el evento especificado ocurre, se ejecuta la función callback asociada.
+
+*/
+
+io.on('connection', async (socket) => {
+  console.log("Usuario conectado");
+  socket.on('disconnect', () => {
+    console.log("Usuario desconectado del namespace /socket");
+  });
+
+  const EmisorId = socket.handshake.auth.EmisorId;
+  const ReceptorId = socket.handshake.auth.ReceptorId;
+
+
+  let mensajes = await listarMensajesEnChat(EmisorId, ReceptorId)
+  socket.emit('mostrar mensajes', mensajes);
+
+
+  socket.on('crear mensaje', async (mensaje) => {
+    const resultado = await crearMensaje(EmisorId, ReceptorId, mensaje);
+    if (resultado === 'Mensaje creado correctamente') {
+      const mensajesActualizados = await listarMensajesEnChat(EmisorId, ReceptorId);
+      io.emit('mostrar mensajes', mensajesActualizados);
+    };
+  });
+});
+
+module.exports = httpServer;
